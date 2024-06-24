@@ -14,7 +14,10 @@ public class Program
         try
         {
             // Specify the path to your input text file containing hex values
-            string filePath = @"D:\My Tasks\C2Gen2\Zoho\EV1-T1218\Ex_Start_Streamer.txt";
+            string filePath = @"D:\ISSUES\EV1-T1209\CONFIG Controller.txt";
+
+            Console.WriteLine("ENTER FILE NAME");
+            string userFileName = Console.ReadLine();
 
             // Read all lines from the file
             string[] lines = File.ReadAllLines(filePath);
@@ -33,6 +36,7 @@ public class Program
 
                     if (parts.Length >= 2)
                     {
+                        int count = 0;
                         foreach (string part in parts)
                         {
                             string pattern = @"0x[\da-fA-F]+(?:,\s*0x[\da-fA-F]+)*";
@@ -43,7 +47,8 @@ public class Program
                             if (match.Success)
                             {
                                 // Split hex values part by ","
-                                string[] hexStrings = part.Split(',');
+                                string[] hexString = part.Split(',');
+                                string[] hexStrings = match.Value.Split(',');
 
                                 string[] filteredHexStrings = new string[hexStrings.Length];
                                 for (int i = 0; i < hexStrings.Length; i++)
@@ -63,14 +68,15 @@ public class Program
                                 // Construct the Command object
                                 Command command = new Command
                                 {
-                                    CommandName = string.Empty,
+                                    CommandName = parts[count - 1].ToString(),
                                     HexValues = hexValues,
-                                    ApiDescription = parts.Length > 2 ? parts[2].Trim() : string.Empty
+                                    ApiDescription = parts.Length > count+1 ? parts[count+1].Trim() : string.Empty
                                 };
                                 // Add command to the list
                                 commands.Add(command);
                                 Console.WriteLine("Extracted hex values: " + hexValues);
                             }
+                            count++;
                         }
 
                     }
@@ -85,6 +91,7 @@ public class Program
 
             // Serialize the container to JSON
             string json = JsonConvert.SerializeObject(container, Newtonsoft.Json.Formatting.Indented);
+            File.WriteAllText($"D:\\ISSUES\\EV1-T1218\\{userFileName}.json", json);
             Console.WriteLine(json);
         }
         catch (Exception ex)
